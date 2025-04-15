@@ -8,29 +8,32 @@
  * @returns {string}
  */
 function formatDate(date, fromFormat, toFormat) {
-  const dateObject = {};
-  const dateParts = date.split(fromFormat[fromFormat.length - 1]);
+  const separatorFrom = fromFormat[fromFormat.length - 1];
+  const separatorTo = toFormat[toFormat.length - 1];
 
-  fromFormat.slice(0, -1).forEach((key, index) => {
-    dateObject[key] = dateParts[index];
+  const keysFrom = fromFormat.slice(0, -1);
+  const keysTo = toFormat.slice(0, -1);
+
+  const parts = date.split(separatorFrom);
+  const dateMap = {};
+
+  keysFrom.forEach((key, index) => {
+    dateMap[key] = parts[index];
   });
 
-  if (dateObject.YYYY) {
-    const shortYear = dateObject.YYYY.slice(2);
-
-    dateObject.YY = shortYear;
+  if (dateMap.YYYY) {
+    dateMap.YY = dateMap.YYYY.slice(2);
   }
 
-  if (dateObject.YY) {
-    const fullYear =
-      dateObject.YY >= 30 ? '19' + dateObject.YY : '20' + dateObject.YY;
+  if (dateMap.YY && !dateMap.YYYY) {
+    const year = parseInt(dateMap.YY, 10);
 
-    dateObject.YYYY = fullYear;
+    dateMap.YYYY = (year >= 30 ? '19' : '20') + dateMap.YY;
   }
 
-  const formattedDate = toFormat.slice(0, -1).map((key) => dateObject[key]);
+  const result = keysTo.map((key) => dateMap[key]);
 
-  return formattedDate.join(toFormat[toFormat.length - 1]);
+  return result.join(separatorTo);
 }
 
 module.exports = formatDate;
